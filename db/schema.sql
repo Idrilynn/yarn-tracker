@@ -1,4 +1,4 @@
-CREATE TYPE yarn_availability AS ENUM ('available', 'out of stock', 'discontinued');
+CREATE TYPE yarn_availability AS ENUM ('available', 'available online' 'out of stock', 'discontinued');
 
 CREATE TABLE catalog_yarn (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
