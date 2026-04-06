@@ -10,7 +10,7 @@ def insert_yarn(product, brand, colour, material, weight, length, dye=None, misc
     cur.close()
     conn.close()
 
-def update_yarn(id, availability=None, misc=None):
+def update_yarn(catalog_id, availability=None, misc=None):
     conn = get_connection()
     cur = conn.cursor()
 
@@ -25,16 +25,16 @@ def update_yarn(id, availability=None, misc=None):
     if not fields:
         return
     query = "UPDATE catalog_yarn SET " + ", ".join(fields) + " WHERE id = %s"
-    values.append(id)
+    values.append(catalog_id)
     cur.execute(query,values)
     conn.commit()
     cur.close()
     conn.close()
 
-def delete_yarn(id):
+def delete_yarn(catalog_id):
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("DELETE FROM catalog_yarn WHERE id = %s ", (id,))
+    cur.execute("DELETE FROM catalog_yarn WHERE id = %s ", (catalog_id,))
     conn.commit()
     cur.close()
     conn.close()

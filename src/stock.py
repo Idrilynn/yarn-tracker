@@ -11,7 +11,7 @@ def insert_yarn_stock(catalog_id, initial_weight, dye_lot=None, misc=None):
     cur.close()
     conn.close()
 
-def update_yarn_stock(id, current_weight, misc=None):
+def update_yarn_stock(stock_id, current_weight, misc=None):
     conn = get_connection()
     cur = conn.cursor()
 
@@ -26,16 +26,16 @@ def update_yarn_stock(id, current_weight, misc=None):
     if not fields:
         return
     query = "UPDATE stock_yarn SET " + ", ".join(fields) + " WHERE id = %s"
-    values.append(id)
+    values.append(stock_id)
     cur.execute(query,values)
     conn.commit()
     cur.close()
     conn.close()
 
-def delete_yarn_stock(id):
+def delete_yarn_stock(stock_id):
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("DELETE FROM stock_yarn WHERE id = %s ", (id,))
+    cur.execute("DELETE FROM stock_yarn WHERE id = %s ", (stock_id,))
     conn.commit()
     cur.close()
     conn.close()
