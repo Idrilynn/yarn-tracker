@@ -2,21 +2,22 @@ import sqlite3
 
 connection = sqlite3.connect('yarn.db')
 connection.execute('''CREATE TABLE IF NOT EXISTS catalogue (
-                        id TEXT PRIMARY KEY,        -- référence unique du type de pelote
-                        picture TEXT,               -- nom du fichier image
-                        brand_name TEXT,            -- marque
-                        yarn_name TEXT,             -- gamme
-                        length REAL NOT NULL,       -- longueur (en mètres)
-                        weight REAL NOT NULL,       -- poids (en grammes)
-                        weight_cat TEXT,            -- catégorie de fil
-                        colour_id TEXT NOT NULL,    -- référence de la couleur
-                        colour_type TEXT NOT NULL,  -- unie ou gradient
-                        colour TEXT NOT NULL,       -- couleur
-                        fibers TEXT,                -- matière
-                        texture TEXT,               -- structure du fil    
-                        place TEXT,                 -- lieu de rangement
-                        where_to_order TEXT,        -- commander le fil
-                        modified_at TEXT            -- date de modification
+                        id TEXT PRIMARY KEY,                     -- référence unique du type de pelote
+                        picture TEXT,                            -- nom du fichier image
+                        brand_name TEXT NOT NULL COLLATE NOCASE, -- marque
+                        yarn_name TEXT NOT NULL COLLATE NOCASE,  -- gamme
+                        length REAL NOT NULL,                    -- longueur (en mètres)
+                        weight REAL NOT NULL,                    -- poids (en grammes)
+                        weight_cat TEXT,                         -- catégorie de fil
+                        colour_id TEXT NOT NULL COLLATE NOCASE,  -- référence de la couleur
+                        colour_type TEXT NOT NULL,               -- unie ou gradient
+                        colour TEXT NOT NULL,                    -- couleur
+                        fibers TEXT,                             -- matière
+                        texture TEXT,                            -- structure du fil    
+                        place TEXT,                              -- lieu de rangement
+                        where_to_order TEXT,                     -- commander le fil
+                        modified_at TEXT,                        -- date de modification
+                        UNIQUE (brand_name, yarn_name, colour_id)-- une seule entrée par combinaison marque + gamme + couleur
                      )
                   ''')
 
