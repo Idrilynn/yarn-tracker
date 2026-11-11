@@ -39,7 +39,7 @@ def add_inventory_item(brand_name, yarn_name, colour_id,
                                    ' AND added_at = ?'
                                    ' AND dye_lot IS ?',
                                           (catalogue_id, weight_remain, added_at, dye_lot)).fetchone()
-    if duplicate_insert[0] is not None and not confirm:
+    if duplicate_insert is not None and not confirm:
         connection.close()
         raise ValueError(f"La pelote semble déjà saisie en base de données [ID: {duplicate_insert[0]}]. "
                          f" Relance avec confirm=True si c’est voulu")

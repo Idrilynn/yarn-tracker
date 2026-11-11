@@ -66,5 +66,11 @@ if __name__ == '__main__':
                    length=160, weight=50, weight_cat='fingering',
                    colour_id='99', colour_type='solid', colour='rouge',
                    fibers='coton', texture=None, place=None, where_to_order=None)# lecture de la table
+
+    add_catalogue_item(picture=None, brand_name='Scheepjes', yarn_name='Catona',
+                   length=125, weight=50, weight_cat='fingering',
+                   colour_id='162', colour_type='solid', colour='marron',
+                   fibers='coton', texture='4 brins', place=None, where_to_order=None)# lecture de la table
+
     list_catalogue()
     list_catalogue(['in_stock'])
