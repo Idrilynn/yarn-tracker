@@ -1,3 +1,5 @@
 .venv/
 yarn.db
 .idea/workspace.xml
+__pycache__/
+.pytest_cache/

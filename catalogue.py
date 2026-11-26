@@ -1,6 +1,6 @@
-import sqlite3
 from datetime import datetime
-from utils import generate_id, make_placeholders
+from utils import generate_id, make_placeholders, get_connection
+
 
 def add_catalogue_item(picture, brand_name, yarn_name,
                        length, weight, weight_cat, colour_id,
@@ -8,55 +8,55 @@ def add_catalogue_item(picture, brand_name, yarn_name,
                        place, where_to_order):
     # date et heure de l'ajout, stockées en texte
     now = datetime.now().isoformat(timespec='seconds')
-    connection = sqlite3.connect('yarn.db')
-    connection.execute('PRAGMA foreign_keys = ON')
-
-    item_id = generate_id()
-    # tant que cet id existe déjà dans le catalogue, on en tire un autre
-    while connection.execute('SELECT 1 FROM catalogue WHERE id = ?',
-                             (item_id,)).fetchone() is not None:
+    connection = get_connection()
+    try:
         item_id = generate_id()
+        # tant que cet id existe déjà dans le catalogue, on en tire un autre
+        while connection.execute('SELECT 1 FROM catalogue WHERE id = ?',
+                                 (item_id,)).fetchone() is not None:
+            item_id = generate_id()
 
-    connection.execute('''INSERT INTO catalogue (id, picture, brand_name, yarn_name,
-                                                 length, weight, weight_cat, colour_id,
-                                                 colour_type, colour, fibers, texture, 
-                                                 place, where_to_order, modified_at)
-                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                       (item_id, picture, brand_name, yarn_name,
-                        length, weight, weight_cat, colour_id,
-                        colour_type, colour, fibers, texture,
-                        place, where_to_order, now))
+        connection.execute('''INSERT INTO catalogue (id, picture, brand_name, yarn_name,
+                                                     length, weight, weight_cat, colour_id,
+                                                     colour_type, colour, fibers, texture, 
+                                                     place, where_to_order, modified_at)
+                              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                           (item_id, picture, brand_name, yarn_name,
+                            length, weight, weight_cat, colour_id,
+                            colour_type, colour, fibers, texture,
+                            place, where_to_order, now))
 
-    connection.commit()
-    connection.close()
+        connection.commit()
+    finally:
+        connection.close()
     return item_id
 
 
 def list_catalogue(statuses=None):
-    connection = sqlite3.connect('yarn.db')
-    if statuses is None:
-        rows = connection.execute('''SELECT catalogue.brand_name, catalogue.yarn_name, catalogue.colour_id,
-                           COUNT(inventory.id)
-                           FROM catalogue
-                           LEFT JOIN inventory ON inventory.catalogue_id = catalogue.id
-                           GROUP BY catalogue.id'''
-                           ).fetchall()
-        connection.close()
+    connection = get_connection()
+    try:
+        if statuses is None:
+            rows = connection.execute('''SELECT catalogue.brand_name, catalogue.yarn_name, catalogue.colour_id,
+                               COUNT(inventory.id)
+                               FROM catalogue
+                               LEFT JOIN inventory ON inventory.catalogue_id = catalogue.id
+                               GROUP BY catalogue.id'''
+                               ).fetchall()
+        else:
+            placeholders = make_placeholders(statuses)
+            rows = connection.execute(f''' SELECT catalogue.brand_name, catalogue.yarn_name, catalogue.colour_id,
+                                COUNT(inventory.id)
+                                FROM catalogue
+                                JOIN inventory ON inventory.catalogue_id = catalogue.id
+                                WHERE inventory.status IN ({placeholders})
+                                GROUP BY catalogue.id''',
+                               statuses
+                               ).fetchall()
         for row in rows:
             print(f'{row[0]} {row[1]} {row[2]} : {row[3]} pelote(s)')
-    else:
-        placeholders = make_placeholders(statuses)
-        rows = connection.execute(f''' SELECT catalogue.brand_name, catalogue.yarn_name, catalogue.colour_id,
-                            COUNT(inventory.id)
-                            FROM catalogue
-                            JOIN inventory ON inventory.catalogue_id = catalogue.id
-                            WHERE inventory.status IN ({placeholders})
-                            GROUP BY catalogue.id''',
-                           statuses
-                           ).fetchall()
+    finally:
         connection.close()
-        for row in rows:
-            print(f'{row[0]} {row[1]} {row[2]} : {row[3]} pelote(s)')
+
 
 
 #TESTS
