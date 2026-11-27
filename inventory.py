@@ -1,4 +1,5 @@
 from datetime import datetime, date
+
 from utils import generate_id, get_connection
 
 
@@ -8,12 +9,14 @@ def add_inventory_item(brand_name, yarn_name, colour_id,
                        weight_init, dye_lot=None, added_at=None, confirm=False):
     # date et heure de l'ajout, stockées en texte
     now = datetime.now().isoformat(timespec='seconds')
+    if not isinstance(weight_init, (int, float)) or weight_init <= 0:
+        raise ValueError(f"Poids invalide: {weight_init}. Indiquer une masse en grammes supérieure à 0")
     connection = get_connection()
     try:
         row = connection.execute('SELECT id FROM catalogue WHERE brand_name = ?'
-                                           ' AND yarn_name = ? '
-                                           ' AND colour_id = ?',
-                                           (brand_name, yarn_name, colour_id)).fetchone()
+                                 ' AND yarn_name = ? '
+                                 ' AND colour_id = ?',
+                                 (brand_name, yarn_name, colour_id)).fetchone()
         if row is None:
             raise ValueError(f"La référence {brand_name} {yarn_name} {colour_id} n'existe pas en catalogue")
 
@@ -31,9 +34,9 @@ def add_inventory_item(brand_name, yarn_name, colour_id,
         status = 'in_stock'
 
         duplicate_insert = connection.execute('SELECT id FROM inventory WHERE catalogue_id = ?'
-                                       ' AND weight_init = ?'
-                                       ' AND added_at = ?'
-                                       ' AND dye_lot IS ?',
+                                              ' AND weight_init = ?'
+                                              ' AND added_at = ?'
+                                              ' AND dye_lot IS ?',
                                               (catalogue_id, weight_remain, added_at, dye_lot)).fetchone()
         if duplicate_insert is not None and not confirm:
             raise ValueError(f"La pelote semble déjà saisie en base de données [ID: {duplicate_insert[0]}]. "

@@ -54,6 +54,7 @@ def create_tables():
     finally:
         connection.close()
 
+
 # lancement à la main: création des tables
 if __name__ == '__main__':
     create_tables()

@@ -13,8 +13,10 @@ def generate_id(length=6):
         new_id += secrets.choice(ID_CHARACTERS)
     return new_id
 
+
 def make_placeholders(values):
     return ', '.join(['?'] * len(values))
+
 
 def get_connection():
     connection = sqlite3.connect(DB_PATH)

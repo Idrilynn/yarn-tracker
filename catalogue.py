@@ -8,6 +8,14 @@ def add_catalogue_item(picture, brand_name, yarn_name,
                        place, where_to_order):
     # date et heure de l'ajout, stockées en texte
     now = datetime.now().isoformat(timespec='seconds')
+    if not isinstance(weight, (int, float)) or weight <= 0:
+        raise ValueError(f"Poids invalide: {weight}. Indiquer une masse en grammes supérieure à 0")
+    if not isinstance(length, (int, float)) or length <= 0:
+        raise ValueError(f"Longueur invalide: {length}. Indiquer une longueur en mètres supérieure à 0")
+    if not isinstance(brand_name, str) or brand_name.strip() == '':
+        raise ValueError("Renseigner la marque de la pelote.")
+    if not isinstance(yarn_name, str) or yarn_name.strip() == '':
+        raise ValueError("Renseigner la gamme de la pelote.")
     connection = get_connection()
     try:
         item_id = generate_id()
@@ -41,7 +49,7 @@ def list_catalogue(statuses=None):
                                FROM catalogue
                                LEFT JOIN inventory ON inventory.catalogue_id = catalogue.id
                                GROUP BY catalogue.id'''
-                               ).fetchall()
+                                      ).fetchall()
         else:
             placeholders = make_placeholders(statuses)
             rows = connection.execute(f''' SELECT catalogue.brand_name, catalogue.yarn_name, catalogue.colour_id,
@@ -50,27 +58,8 @@ def list_catalogue(statuses=None):
                                 JOIN inventory ON inventory.catalogue_id = catalogue.id
                                 WHERE inventory.status IN ({placeholders})
                                 GROUP BY catalogue.id''',
-                               statuses
-                               ).fetchall()
-        for row in rows:
-            print(f'{row[0]} {row[1]} {row[2]} : {row[3]} pelote(s)')
+                                      statuses
+                                      ).fetchall()
     finally:
         connection.close()
-
-
-
-#TESTS
-if __name__ == '__main__':
-# test : une référence fictive
-    add_catalogue_item(picture=None, brand_name='Drops', yarn_name='Safran',
-                   length=160, weight=50, weight_cat='fingering',
-                   colour_id='99', colour_type='solid', colour='rouge',
-                   fibers='coton', texture=None, place=None, where_to_order=None)# lecture de la table
-
-    add_catalogue_item(picture=None, brand_name='Scheepjes', yarn_name='Catona',
-                   length=125, weight=50, weight_cat='fingering',
-                   colour_id='162', colour_type='solid', colour='marron',
-                   fibers='coton', texture='4 brins', place=None, where_to_order=None)# lecture de la table
-
-    list_catalogue()
-    list_catalogue(['in_stock'])
+    return rows
